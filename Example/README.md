@@ -75,4 +75,4 @@ If you find any bugs or have any suggestions for improvements, please use the is
 
 If you use tStreamingArchiver for research, please cite the following...
 
-`Moon B.R. (2012). tStreamingArchiver <version number> [Software]. Available from [https://github.com/brendam/tStreamingArchiver], <date of access>`
+`Moon B.R. (2012). tStreamingArchiver <version number> [Software]. Available from https://github.com/brendam/tStreamingArchiver, <date of access>`

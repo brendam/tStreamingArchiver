@@ -1,0 +1,8 @@
+// see http://twitter4j.org/en/configuration.html for available properties
+// having debug=true will put all the tweets into the log files
+debug=false
+
+oauth.consumerKey=xxx
+oauth.consumerSecret=xxx
+oauth.accessToken=xxx
+oauth.accessTokenSecret=xxx

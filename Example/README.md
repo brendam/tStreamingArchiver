@@ -4,10 +4,10 @@ The three sample shell script files will work on linux and mac osx.
 
 Before they can be run, you must:
 
-1. create the twitter4j.properties from twitter4j.properties.sample with the OAuth login details for your research Twitter account.
-2. create the tArchiver.properties from tArchiver.properties.sample with your mySQL database details and email details for error messages. (runStreamingArchiver.sh can be used to collect data without needing a mySQL database)
-3. edit ./data/searches.txt to set the keyword and userid searches
-4. runSearchArchiver.sh writes directly to the SearchAPI mySQL database, so this must exist and it's details be in the tArchiver.properties file.
+1. create the `twitter4j.properties` from `twitter4j.properties.sample` with the OAuth login details for your research Twitter account.
+2. create the `tArchiver.properties` from `tArchiver.properties.sample` with your mySQL database details and email details for error messages. (`runStreamingArchiver.sh` can be used to collect data without needing a mySQL database)
+3. edit `./data/searches.txt` to set the keyword and userid searches
+4. `runSearchArchiver.sh` writes directly to the SearchAPI mySQL database, so this must exist and it's details be in the `tArchiver.properties` file.
 
 ### format of `searches.txt` file
 
@@ -53,10 +53,10 @@ You need to create a mySQL user and password with access to the databases and up
 ###Suggested cron file
 
 Cron automates the running of the shell scripts once you are sure they are working correctly.
-Create or edit your crontab file by using 'crontab -e' at the terminal prompt 
-(it uses the vi editor, so you need to know how to use that). I have it setup to start the runStreamingArchiver.sh script every second. The shell script test for a lck file to see if it is already running and exits immediately if it is.
+Create or edit your crontab file by using `crontab -e` at the terminal prompt 
+(it uses the vi editor, so you need to know how to use that). I have it setup to start the `runStreamingArchiver.sh` script every second. The shell script test for a lck file to see if it is already running and exits immediately if it is.
 
-The import to mySQL runs once a day at 23:55. By using 'nice -3' it gets a lower priority than runStreamingArchiver.sh to make sure that it doesn't impact the initial data capture.
+The import to mySQL runs once a day at 23:55. By using 'nice -3' it gets a lower priority than `runStreamingArchiver.sh` to make sure that it doesn't impact the initial data capture.
 
 The searchAPI program runs every 20 minutes.
 
@@ -65,7 +65,7 @@ Change pathToWorkingDirectory to be the full path to the shell script on your sy
 `# m h  dom mon dow   command
 20,40,0 * * * * /pathToWorkingDirectory/runSearchArchiver.sh
  * * * * * /pathToWorkingDirectory/runStreamingArchiver.sh
- 55 23 * * * nice -3 /pathToWorkingDirectory/sql_import_and_process.sh`
+ 55 23 * * * nice -3 /pathToWorkingDirectory sql_import_and_process.sh`
 
 ###Bugs / Requests
 
@@ -76,3 +76,5 @@ If you find any bugs or have any suggestions for improvements, please use the is
 If you use tStreamingArchiver for research, please cite the following...
 
 `Moon B.R. (2012). tStreamingArchiver <version number> [Software]. Available from https://github.com/brendam/tStreamingArchiver, <date of access>`
+
+BibTex: [tStreamingArchiver.bib](https://github.com/brendam/tStreamingArchiver/blob/master/tStreamingArchiver.bib)

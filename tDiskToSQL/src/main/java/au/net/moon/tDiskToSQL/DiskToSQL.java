@@ -17,6 +17,7 @@ package au.net.moon.tDiskToSQL;
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  **/
 
+import twitter4j.json.DataObjectFactory;
 import au.net.moon.tUtils.RedirectSystemLogs;
 import au.net.moon.tUtils.SimpleSSLMail;
 import au.net.moon.tUtils.WriteToTwitterStreamArchiveSQL;
@@ -53,7 +54,7 @@ public class DiskToSQL {
 		if (!debug) {
 			new RedirectSystemLogs("tDiskToSQL.%g.log");
 		}
-		System.out.println("tDiskToSql: Program Starting... (v0.87)");
+		System.out.println("tDiskToSql: Program Starting... (v0.88)");
 		new DiskToSQL();
 		System.out.println("tDiskToSql: Program finished");
 	}
@@ -65,7 +66,10 @@ public class DiskToSQL {
 		if (sql.isDatabaseReady()) {
 			ReadFromDisk newRead = new ReadFromDisk();
 			while (newRead.nextStatus()) {
-				if (twitterFields.isTweet(newRead.getStatus())) {
+				if (newRead.getStatus().startsWith("{")) {
+					// json object saved by new approach DataObjectFactory.getRawJSON(status)
+					// TODO: refactor saving to SQL to use twitter4J User and Status objects created by DataObjectFactory.createStatus()
+				} else if (twitterFields.isTweet(newRead.getStatus())) {
 					sql.tweetToSQL(newRead.getStatus());
 				} else if (twitterFields.isDeletionNotice(newRead.getStatus())) {
 					sql.processDeletionNotice(newRead.getStatus());

@@ -27,6 +27,7 @@ import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
 import twitter4j.TwitterException;
 import twitter4j.TwitterStream;
+import twitter4j.json.DataObjectFactory;
 import au.net.moon.tUtils.RedirectSystemLogs;
 import au.net.moon.tUtils.SearchFilter;
 import au.net.moon.tUtils.SimpleSSLMail;
@@ -54,7 +55,7 @@ import au.net.moon.tUtils.twitterAuthorise;
  * <p>
  * 
  * @author Brenda Moon - brenda at moon.net.au
- * @version 1.00
+ * @version 1.01
  * 
  */
 // I've considered using serialisation instead of "toString()" for saving the
@@ -88,7 +89,7 @@ public class Archiver implements StatusListener {
 		}
 
 		System.out
-				.println("TwitterStreamingArchiver: Program Starting... (v1.00)");
+				.println("TwitterStreamingArchiver: Program Starting... (v1.01)");
 		
 		SearchFilter searchFilter = new SearchFilter();
 		Archiver archiver = new Archiver();
@@ -122,10 +123,15 @@ public class Archiver implements StatusListener {
 	 * (non-Javadoc) When a tweet is received, save it to disk.
 	 * 
 	 * @see twitter4j.StatusListener#onStatus(twitter4j.Status)
+	 * 
 	 */
 	public void onStatus(Status status) {
 		waitSeconds = 0;
-		std.save(status.toString());
+		// std.save(status.toString());
+		// Change how I'm storing the tweets so DataObjectFactory.createStatus() can be used to 
+		// reload them from file instead of the string parsing in tDiskToSQL.
+		String jsonText = DataObjectFactory.getRawJSON(status);
+		std.save(jsonText);
 	}
 
 	/*

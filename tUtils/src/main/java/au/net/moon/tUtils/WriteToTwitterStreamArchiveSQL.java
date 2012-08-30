@@ -273,7 +273,7 @@ public class WriteToTwitterStreamArchiveSQL {
 	 * other type of tweets. The streaming API has the fullest tweet data, and
 	 * includes the user data. So if the stream API had the tweet, it should be
 	 * in the database when it is also found from a different source. The second
-	 * occurance of the tweet isn't stored but the API Overlap table and
+	 * occurrence of the tweet isn't stored but the API Overlap table and
 	 * SearchAPI tweet fields in the tweet table are updated.
 	 * 
 	 * @param tweet

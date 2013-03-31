@@ -22,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+import twitter4j.User;
+
 /**
  * Twitter User object.
  * 
@@ -209,7 +211,7 @@ public class TUser {
 		favouritesCount = twitterUser.getFavouritesCount();
 		utcOffset = twitterUser.getUtcOffset();
 		timeZone = twitterUser.getTimeZone();
-		profileBackgroundImageUrl = twitterUser.getProfileBackgroundImageUrl()
+		profileBackgroundImageUrl = twitterUser.getOriginalProfileImageURL()
 				.toString();
 		isProfileBackgroundTiled = twitterUser.isProfileBackgroundTiled();
 		statusesCount = twitterUser.getStatusesCount();

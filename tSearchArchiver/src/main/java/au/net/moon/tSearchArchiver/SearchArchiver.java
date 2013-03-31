@@ -34,12 +34,9 @@ import java.util.TimeZone;
 
 import twitter4j.Query;
 import twitter4j.QueryResult;
-import twitter4j.Tweet;
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-// import twitter4j.TwitterFactory;
-
 import au.net.moon.tUtils.RedirectSystemLogs;
 import au.net.moon.tUtils.twitterAuthorise;
 
@@ -48,13 +45,13 @@ import au.net.moon.tUtils.twitterAuthorise;
  * historic info. So this program archives the search results into a mySQL
  * database to build up an archive for the search term(s).
  * <p>
- * Search API is rate limited by IP address, and white listing is based on IP
- * address - so no advantage in authenticating before doing searches
- * (not sure this is true - I see a much higher limit when using a whitelisted oauth research account)
- * <p>
  * TODO Search back-offs: query less often for searches that have no results.<br>
  * TODO Search more often for terms that are approaching 1500 limit.
  * 
+ * NOTE: 27 Mar 2013: Updates for new version of twitter4j are using new twitter API (search now 
+ *       returns a status object same as streamAPI instead of the older tweet object). Not sure that my mapping
+ *       of new fields to replace the old ones is correct.
+ *       
  * @param args
  * @author Brenda Moon
  * @version 1.00
@@ -82,7 +79,7 @@ public class SearchArchiver {
 			.println("tSearchArchiver: Logging to system log files");
 		}
 
-		System.out.println("tStreamArchiver: Program Starting... (v1.0)");
+		System.out.println("tSearchArchiver: Program Starting... (v1.2)");
 
 		new SearchArchiver();
 
@@ -92,10 +89,9 @@ public class SearchArchiver {
 	SearchArchiver() {
 
 		Twitter twitter;
-		int pageNumber = 1;
 		int waitBetweenRequests = 2000;
 		// 2 sec delay between requests to avoid maxing out the API.
-		Tweet tweet;
+		Status theTweet;
 		Query query;
 		QueryResult result;
 
@@ -115,9 +111,6 @@ public class SearchArchiver {
 
 		twitterAuthorise twitterAuth = new twitterAuthorise(false);
 		twitter = twitterAuth.getTwitter();
-
-		query = new Query();
-		query.setRpp(100); // max number per page
 
 		// Open the old twitter_archive database
 		openSQLDataBase();
@@ -151,11 +144,12 @@ public class SearchArchiver {
 
 			// set initial value of i to start from middle of search set
 			while (searchIndex < searchQuery.size()) {
-				pageNumber = 1;
+
+				query = new Query();
 				query.setQuery(searchQuery.get(searchIndex));
-				query.setPage(pageNumber);
 				// check to see if their are any tweets already in the database for
 				// this search
+				//TODO: Change this to look in new raw data files for each search instead
 				long max_tw_id = 0;
 				try {
 					rs = stmt
@@ -175,11 +169,20 @@ public class SearchArchiver {
 				// System.out.println("Starting searching for tweets for: " +
 				// query.getQuery());
 
+				
+				// new style replacement for pagination
+				//	Query query = new Query("whatEverYouWantToSearch"); 
+				//	do { 
+				//	    result = twitter.search(query); 
+				//	    System.out.println(result); 
+					    // do something 
+  			   //		} while ((query = result.nextQuery()) != null); 
+               // TODO: check if twitter4j is doing all the backing off handling already
+				
 				int tweetCount = 0;
 				Boolean searching = true;
-				while (searching) {
+				do {
 
-					// ----
 					// delay waitBetweenRequests milliseconds before making request
 					// to make sure not overloading API
 					try {
@@ -206,29 +209,20 @@ public class SearchArchiver {
 								.println("tSearchArchiver: Sleep for 10 minutes because of API load failed.");
 								e1.printStackTrace();
 							}
-						} else if (e.getMessage().contains(
-								"page parameter out of range")) {
-							// no more results, is there a better way to check this?
-							System.out
-							.println("tSearchArchiver Error: Page parameter out of range");
-							searching = false;
-							break;
 						}
 						result = null;
 					}
 
-					// -----
 
 					if (result != null) {
-						List<Tweet> results = result.getTweets();
+						List<Status> results = result.getTweets();
 						if (results.size() == 0) {
 							searching = false;
 						} else {
 							tweetCount += results.size();
-							// FIXME: get clean function from other program here
 							for (int j = 0; j < results.size(); j++) {
-								tweet = (Tweet) results.get(j);
-								String cleanText = tweet.getText();
+								theTweet = (Status) results.get(j);
+								String cleanText = theTweet.getText();
 								cleanText = cleanText.replaceAll("'", "&#39;");
 								cleanText = cleanText.replaceAll("\"", "&quot;");
 
@@ -236,22 +230,20 @@ public class SearchArchiver {
 									stmt.executeUpdate("insert into archive values (0, "
 											+ searchId.get(searchIndex)
 											+ ", '"
-											+ tweet.getId() + "', now())");
+											+ theTweet.getId() + "', now())");
 								} catch (SQLException e) {
 									System.err
 									.println("tSearchArchiver: Insert into archive failed.");
 									System.err.println(searchId.get(searchIndex)
-											+ ", " + tweet.getId());
+											+ ", " + theTweet.getId());
 
 									e.printStackTrace();
 								}
-								// check if the tweet already exists, if not store
-								// it.
-								// println("tweet.getId(): " + tweet.getId());
+// TODO: change to storing in file instead of database
 								try {
 									rs = stmt
 											.executeQuery("select id from tweets where id = "
-													+ tweet.getId());
+													+ theTweet.getId());
 								} catch (SQLException e) {
 									System.err
 									.println("tSearchArchiver: checking for tweet in tweets archive failed.");
@@ -267,59 +259,61 @@ public class SearchArchiver {
 								}
 								if (tweetNotInArchive) {
 									String tempLangCode = "";
-									if (tweet.getIsoLanguageCode() != null) {
-										if (tweet.getIsoLanguageCode().length() > 2) {
-											System.out
-											.println("tSearchArchiver Error: IsoLanguageCode too long: >"
-													+ tweet.getIsoLanguageCode()
-													+ "<");
-											tempLangCode = tweet
-													.getIsoLanguageCode()
-													.substring(0, 2);
-										} else {
-											tempLangCode = tweet
-													.getIsoLanguageCode();
-										}
-									}
+									// getIsoLanguageCode() has been removed from twitter4j
+									// looks like it might be added back in in the next version
+//									if (tweet.getIsoLanguageCode() != null) {
+//										if (tweet.getIsoLanguageCode().length() > 2) {
+//											System.out
+//											.println("tSearchArchiver Error: IsoLanguageCode too long: >"
+//													+ tweet.getIsoLanguageCode()
+//													+ "<");
+//											tempLangCode = tweet
+//													.getIsoLanguageCode()
+//													.substring(0, 2);
+//										} else {
+//											tempLangCode = tweet
+//													.getIsoLanguageCode();
+//										}
+//									}
 									double myLatitude = 0;
 									double myLongitude = 0;
 									int hasGeoCode = 0;
 
-									if (tweet.getGeoLocation() != null) {
+									if (theTweet.getGeoLocation() != null) {
 										System.out
 										.println("GeoLocation: "
-												+ tweet.getGeoLocation()
+												+ theTweet.getGeoLocation()
 												.toString());
-										myLatitude = tweet.getGeoLocation()
+										myLatitude = theTweet.getGeoLocation()
 												.getLatitude();
-										myLongitude = tweet.getGeoLocation()
+										myLongitude = theTweet.getGeoLocation()
 												.getLongitude();
 										hasGeoCode = 1;
 									}
-									Date tempCreatedAt = tweet.getCreatedAt();
+									Date tempCreatedAt = theTweet.getCreatedAt();
 									String myDate2 = myFormatter.format(
 											tempCreatedAt, new StringBuffer(),
 											new FieldPosition(0)).toString();
 									totalTweets++;
 									try {
 										stmt.executeUpdate("insert into tweets values  ("
-												+ tweet.getId()
+												+ theTweet.getId()
 												+ ", '"
 												+ tempLangCode
 												+ "', '"
-												+ tweet.getSource()
+												+ theTweet.getSource()
 												+ "', '"
 												+ cleanText
 												+ "', '"
 												+ myDate2
 												+ "', '"
-												+ tweet.getToUserId()
+												+ theTweet.getInReplyToUserId()
 												+ "', '"
-												+ tweet.getToUser()
+												+ theTweet.getInReplyToScreenName()
 												+ "', '"
-												+ tweet.getFromUserId()
+												+ theTweet.getUser().getId()
 												+ "', '"
-												+ tweet.getFromUser()
+												+ theTweet.getUser().getScreenName()
 												+ "', '"
 												+ hasGeoCode
 												+ "',"
@@ -330,25 +324,23 @@ public class SearchArchiver {
 									} catch (SQLException e) {
 										System.err
 										.println("tSearchArchiver: Insert into tweets failed.");
-										System.err.println(tweet.getId() + ", '"
+										System.err.println(theTweet.getId() + ", '"
 												+ tempLangCode + "', '"
-												+ tweet.getSource() + "', '"
+												+ theTweet.getSource() + "', '"
 												+ cleanText + "', '" + myDate2
-												+ "', '" + tweet.getToUserId()
-												+ "', '" + tweet.getToUser()
-												+ "', '" + tweet.getFromUserId()
-												+ "', '" + tweet.getFromUser());
+												+ "', '" + theTweet.getInReplyToUserId()
+												+ "', '" + theTweet.getInReplyToScreenName()
+												+ "', '" + theTweet.getUser().getId()
+												+ "', '" + theTweet.getUser().getScreenName());
 
 										e.printStackTrace();
 									}
 								}
 
 							}
-							pageNumber++;
-							query.setPage(pageNumber);
 						}
-					}
-				}
+					} 
+				}  while ((query = result.nextQuery()) != null && searching);
 
 				if (tweetCount > 0) {
 					System.out.println("tSearchArchiver: New Tweets Found for \""

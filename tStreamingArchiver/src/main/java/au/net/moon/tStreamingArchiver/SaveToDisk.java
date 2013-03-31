@@ -63,14 +63,6 @@ public class SaveToDisk {
 	}
 
 	/**
-	 * Close the data file (not used)
-	 */
-	// void close() {
-	// pw.flush();
-	// pw.close();
-	// }
-
-	/**
 	 * Save the Twitter tweet/deletion notice/track limitation notice to the
 	 * current data file. Open a new data file if the existing one is more than
 	 * 1 hour old.
@@ -91,7 +83,7 @@ public class SaveToDisk {
 			counter = 0;
 		} else {
 			pw.println(jsonString);
-			pw.println("=====================================");
+			pw.println("==================~===================");
 			pw.flush();
 		}
 	}

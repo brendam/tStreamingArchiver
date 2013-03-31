@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import twitter4j.Status;
+
 import au.net.moon.tUtils.twitterFields;
 
 /**
@@ -241,6 +243,20 @@ public class WriteToTwitterStreamArchiveSQL {
 		}
 	}
 
+	/**
+	 * Add tweet into database from twitter4j.statusObj. (Used by
+	 * TwitterDiskToSQL)
+	 * 
+	 * @param tweetString
+	 *            a json string tweet
+	 */
+	public void tweetToSQL(Status statusObj) {
+		HashMap<String, String> tweet = twitterFields.parseStatusObj(statusObj);
+		TUser user = new TUser(statusObj.getUser());
+		tweetToSQL(tweet, user);
+	}
+
+	
 	/**
 	 * Add tweet into database from raw json string format tweet. (Used by
 	 * TwitterDiskToSQL)

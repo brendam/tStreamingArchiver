@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>au.net.moon.tDiskToSQL</groupId>
 	<artifactId>tDiskToSQL</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>tDiskToSQL</name>
 	<description>Takes data saved by tStreamingArchiver and inserts it into a SQL database</description>
 	<properties>

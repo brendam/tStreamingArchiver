@@ -4,5 +4,5 @@
 FILTER=$(find . -type f \( -name "TwitterArchiverLog*.lck" \) )
 
 if [ -z ${FILTER} ]; then       
-	java -jar tStreamingArchiver-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+	java -jar tStreamingArchiver-0.0.2-SNAPSHOT-jar-with-dependencies.jar
 fi

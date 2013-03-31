@@ -17,6 +17,10 @@ package au.net.moon.tDiskToSQL;
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  **/
 
+import twitter4j.Status;
+import twitter4j.StatusDeletionNotice;
+import twitter4j.TwitterException;
+import twitter4j.internal.org.json.JSONObject;
 import twitter4j.json.DataObjectFactory;
 import au.net.moon.tUtils.RedirectSystemLogs;
 import au.net.moon.tUtils.SimpleSSLMail;
@@ -54,32 +58,52 @@ public class DiskToSQL {
 		if (!debug) {
 			new RedirectSystemLogs("tDiskToSQL.%g.log");
 		}
-		System.out.println("tDiskToSql: Program Starting... (v0.88)");
+		System.out.println("tDiskToSql: Program Starting... (v0.90)");
 		new DiskToSQL();
 		System.out.println("tDiskToSql: Program finished");
 	}
 
 	DiskToSQL() {
 		sendMail = new SimpleSSLMail();
+		Object statusObj = null;
 		WriteToTwitterStreamArchiveSQL sql = new WriteToTwitterStreamArchiveSQL(
 				"Stream");
 		if (sql.isDatabaseReady()) {
 			ReadFromDisk newRead = new ReadFromDisk();
 			while (newRead.nextStatus()) {
-				if (newRead.getStatus().startsWith("{")) {
-					// json object saved by new approach DataObjectFactory.getRawJSON(status)
-					// TODO: refactor saving to SQL to use twitter4J User and Status objects created by DataObjectFactory.createStatus()
-				} else if (twitterFields.isTweet(newRead.getStatus())) {
-					sql.tweetToSQL(newRead.getStatus());
-				} else if (twitterFields.isDeletionNotice(newRead.getStatus())) {
-					sql.processDeletionNotice(newRead.getStatus());
-				} else if (twitterFields.isTrackLimitation(newRead.getStatus())) {
-					sql.processTrackLimitation(newRead.getStatus(),
-							newRead.dataFileDate());
-				} else {
-					String message = "tDiskToSQL: unexpected Twitter response: ";
-					System.err.println(message + newRead.getStatus());
-					sendMail.sendMessage(message, message + newRead.getStatus());
+				boolean isStatus = false;
+				if (newRead.isStatusNewType()) { 
+					// new style string json object saved by DataObjectFactory.getRawJSON(status)
+					try {
+						statusObj = DataObjectFactory.createObject(newRead.getStatus());
+					} catch (TwitterException e) {
+						String message = "tDiskToSQL: couldn't convert json string to JSONObject: ";
+						System.err.println(message + newRead.getStatus());
+						sendMail.sendMessage(message, message + newRead.getStatus());
+					} 
+					if (statusObj instanceof Status) {
+						//	new style status object
+						sql.tweetToSQL((Status) statusObj);
+						isStatus = true;
+					} 
+				} else { // OLD Style broken json status object
+					if (twitterFields.isTweet(newRead.getStatus())) {
+						sql.tweetToSQL(newRead.getStatus());
+						isStatus = true;
+					}
+				}
+
+				if (! isStatus) {
+					if (twitterFields.isDeletionNotice(newRead.getStatus())) {
+						sql.processDeletionNotice(newRead.getStatus());
+					} else if (twitterFields.isTrackLimitation(newRead.getStatus())) {
+						sql.processTrackLimitation(newRead.getStatus(),
+								newRead.dataFileDate());
+					} else {
+						String message = "tDiskToSQL: unexpected Twitter response: ";
+						System.err.println(message + newRead.getStatus());
+						sendMail.sendMessage(message, message + newRead.getStatus());
+					}
 				}
 			}
 		}

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>au.net.moon.tSearchArchiver</groupId>
   <artifactId>tSearchArchiver</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.3-SNAPSHOT</version>
   <name>tSearchArchiver</name>
   <description>Use the searchAPI to archive tweets directly into the Search mySQL database</description>
  	<properties>

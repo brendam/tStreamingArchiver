@@ -19,6 +19,8 @@ package au.net.moon.tUtils;
 
 import java.util.HashMap;
 
+import twitter4j.Status;
+
 import au.net.moon.tUtils.TUser;
 
 /**
@@ -34,22 +36,22 @@ import au.net.moon.tUtils.TUser;
 // "isFollowRequestSent"
 public class twitterFields {
 	private static final String[] statusFields = { "createdAt", "id", "text",
-			"source", "isTruncated", "inReplyToStatusId", "inReplyToUserId",
-			"isFavorited", "inReplyToScreenName", "geoLocation", "place",
-			"retweetCount", "wasRetweetedByMe", "contributors", "annotations",
-			"retweetedStatus", "userMentionEntities", "urlEntities",
-			"hashtagEntities", "user" };
+		"source", "isTruncated", "inReplyToStatusId", "inReplyToUserId",
+		"isFavorited", "inReplyToScreenName", "geoLocation", "place",
+		"retweetCount", "wasRetweetedByMe", "contributors", "annotations",
+		"retweetedStatus", "userMentionEntities", "urlEntities",
+		"hashtagEntities", "user" };
 	private static final String[] userFields = { "id", "name", "screenName",
-			"location", "description", "isContributorsEnabled",
-			"profileImageUrl", "url", "isProtected", "followersCount",
-			"status", "profileBackgroundColor", "profileTextColor",
-			"profileLinkColor", "profileSidebarFillColor",
-			"profileSidebarBorderColor", "profileUseBackgroundImage",
-			"showAllInlineMedia", "friendsCount", "createdAt",
-			"favouritesCount", "utcOffset", "timeZone",
-			"profileBackgroundImageUrl", "profileBackgroundTiled", "lang",
-			"statusesCount", "isGeoEnabled", "isVerified", "translator",
-			"listedCount", "isFollowRequestSent" };
+		"location", "description", "isContributorsEnabled",
+		"profileImageUrl", "url", "isProtected", "followersCount",
+		"status", "profileBackgroundColor", "profileTextColor",
+		"profileLinkColor", "profileSidebarFillColor",
+		"profileSidebarBorderColor", "profileUseBackgroundImage",
+		"showAllInlineMedia", "friendsCount", "createdAt",
+		"favouritesCount", "utcOffset", "timeZone",
+		"profileBackgroundImageUrl", "profileBackgroundTiled", "lang",
+		"statusesCount", "isGeoEnabled", "isVerified", "translator",
+		"listedCount", "isFollowRequestSent" };
 	private final static String programName = "twitterFields";
 
 	twitterFields() {
@@ -106,9 +108,9 @@ public class twitterFields {
 					.indexOf("=") + 1));
 		} else {
 			System.err
-					.println(programName
-							+ ": parseTrackLimitation called with wrong status type : status: "
-							+ status.substring(0, 40));
+			.println(programName
+					+ ": parseTrackLimitation called with wrong status type : status: "
+					+ status.substring(0, 40));
 			status = "";
 		}
 		return numberLimited;
@@ -137,9 +139,9 @@ public class twitterFields {
 			fields[1] = userId;
 		} else {
 			System.err
-					.println(programName
-							+ ": parseDeletionNotice called with wrong status type : status: "
-							+ status.substring(0, 40));
+			.println(programName
+					+ ": parseDeletionNotice called with wrong status type : status: "
+					+ status.substring(0, 40));
 			fields[0] = "";
 			fields[1] = "";
 		}
@@ -298,6 +300,64 @@ public class twitterFields {
 		// proveRetweetsAreJustRepeats(splitFields);
 		return splitFields;
 	}
+
+
+	/**
+	 * Get a <CODE>HashMap</CODE> of tweet fields by parsing a twitter4j Status
+	 * 
+	 * @param status
+	 *            the twitter4j Status object
+	 * @return the tweet fields as name, value pairs in a <CODE>HashMap</CODE>.
+	 */
+	public static HashMap<String, String> parseStatusObj(Status status) {
+		HashMap<String, String> splitFields = new HashMap<String, String>();
+
+		splitFields.put("createdAt", status.getCreatedAt().toString());
+		splitFields.put("id", Long.toString(status.getId()));
+		splitFields.put("text", status.getText());
+		splitFields.put("source", status.getSource());
+		splitFields.put("isTruncated", status.isTruncated() ? "1" : "0");
+		splitFields.put("inReplyToStatusId", Long.toString(status.getInReplyToStatusId()));
+		splitFields.put("inReplyToUserId",Long.toString(status.getInReplyToUserId()));
+		splitFields.put("isFavorited", status.isFavorited() ? "1" : "0");
+		splitFields.put("inReplyToScreenName", status.getInReplyToScreenName());
+		if (status.getGeoLocation() != null) {
+			splitFields.put("geoLocation", status.getGeoLocation().toString());
+		} else {
+			splitFields.put("geoLocation", "");
+		}
+		if (status.getPlace() != null) {
+			splitFields.put("place",status.getPlace().toString());
+		} else {
+			splitFields.put("place", "");
+		}
+		splitFields.put("retweetCount", Long.toString(status.getRetweetCount()));
+		splitFields.put("wasRetweetedByMe", status.isRetweetedByMe() ? "1" : "0");
+	    String contributors = "";
+		if (status.getContributors() != null) {
+			long [] tempContributors = status.getContributors();
+			for (int i = 0; i < tempContributors.length; i++) {
+				contributors += Long.toString(tempContributors[i]);
+				if (i != tempContributors.length - 1) {
+					contributors += ", ";
+				}
+			}
+		}
+		splitFields.put("contributors", contributors);
+		splitFields.put("annotations", "");
+		if (status.getRetweetedStatus() != null) {
+			splitFields.put("retweetedStatus", "1");
+		} else {
+			splitFields.put("retweetedStatus", "0");
+		}
+		splitFields.put("userMentionEntities", status.getUserMentionEntities().toString());
+		splitFields.put("urlEntities",status.getURLEntities().toString());
+		splitFields.put("hashtagEntities",status.getHashtagEntities().toString()); 
+		splitFields.put("user", status.getUser().toString());
+		return splitFields;
+	}
+
+
 
 	/**
 	 * Get the tweet longitude from the geoLocation field.

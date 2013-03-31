@@ -58,10 +58,6 @@ import au.net.moon.tUtils.twitterAuthorise;
  * @version 1.01
  * 
  */
-// I've considered using serialisation instead of "toString()" for saving the
-// item to disk. The status & deletion notice are serialisable. But the Track
-// Limitation & GeoScrub are not.
-// From what I've read, serialisation is likely to be worse performance?
 public class Archiver implements StatusListener {
 	static TwitterStream twitterStream;
 	public SaveToDisk std;
@@ -89,15 +85,11 @@ public class Archiver implements StatusListener {
 		}
 
 		System.out
-				.println("TwitterStreamingArchiver: Program Starting... (v1.01)");
+				.println("TwitterStreamingArchiver: Program Starting... (v1.02)");
 		
 		SearchFilter searchFilter = new SearchFilter();
 		Archiver archiver = new Archiver();
-		// twitterStream.addStatusListener(archiver);
 		twitterStream.addListener(archiver);
-		// sample() == gardenhose
-		// twitterStream.sample();
-		// seems like historyCount isn't supported yet?
 		final int historyCount = 0;
 		FilterQuery query = new FilterQuery();
 		query.follow(searchFilter.followArray());
@@ -148,7 +140,7 @@ public class Archiver implements StatusListener {
 	}
 
 	/*
-	 * (non-Javadoc) When a rate limitiation notice is received, save it to
+	 * (non-Javadoc) When a rate limitation notice is received, save it to
 	 * disk.
 	 * 
 	 * @see twitter4j.StatusListener#onTrackLimitationNotice(int)

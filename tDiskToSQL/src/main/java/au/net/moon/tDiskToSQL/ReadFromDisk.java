@@ -46,10 +46,13 @@ public class ReadFromDisk {
 	// counter is being used, don't know why eclipse thinks it isn't
 	private int counter;
 	private String mySeperator = ("=====================================");
+	private String newSeperator = ("==================~===================");
 	private ArrayList<File> dataFiles;
 	private java.util.Iterator<File> itr;
 	private File dataFile;
 	private String status;
+	private boolean newStyleStatus;
+
 
 	ReadFromDisk() {
 		// initialise the list of dataFiles;
@@ -136,11 +139,18 @@ public class ReadFromDisk {
 			}
 			while (nextStatus && status.length() == 0) {
 				Boolean buildStatus = true;
+				// DataObjectFactory.createStatus() can be used to 
+				// reload them from file 
 				while (buildStatus && (strLine = br.readLine()) != null) {
-					if (!strLine.equals(mySeperator)) {
+					if (!(strLine.equals(mySeperator) || strLine.equals(newSeperator))){
 						status += strLine;
 					} else {
 						buildStatus = false;
+						if (strLine.equals(newSeperator)){
+							newStyleStatus = true;
+						} else {
+							newStyleStatus = false;
+						}
 					}
 					counter++;
 				}
@@ -170,6 +180,16 @@ public class ReadFromDisk {
 	 */
 	public String getStatus() {
 		return status;
+	}
+
+	/**
+	 * Which type of status object is it - the older broken json
+	 * or new correct json object.
+	 * 
+	 * @return a single Twitter status json string
+	 */
+	public boolean isStatusNewType() {
+		return newStyleStatus;
 	}
 
 	/**

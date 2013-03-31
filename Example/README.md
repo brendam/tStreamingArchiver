@@ -9,6 +9,8 @@ Before they can be run, you must:
 3. edit `./data/searches.txt` to set the keyword and userid searches
 4. `runSearchArchiver.sh` writes directly to the SearchAPI mySQL database, so this must exist and it's details be in the `tArchiver.properties` file.
 
+Note: If you are updating from an earlier version of tStreamingArchiver you must add `jsonStoreEnabled=true` to twitter4j.properties to enable saving the raw json format data.
+
 ### format of `searches.txt` file
 
 The `searches.txt` file contains all of the searches for the Streaming API in tab delimeted format. The first column is the id of the matching search in the searches table of the mySQL database but is not used by runStreamingArchiver.sh. The second column is either the single word search keyword or a Twitter user name, the final column is either k for keyword searches or the Twitter user id number matching the Twitter user name.

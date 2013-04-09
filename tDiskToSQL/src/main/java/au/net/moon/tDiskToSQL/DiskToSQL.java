@@ -58,7 +58,7 @@ public class DiskToSQL {
 		if (!debug) {
 			new RedirectSystemLogs("tDiskToSQL.%g.log");
 		}
-		System.out.println("tDiskToSql: Program Starting... (v0.90)");
+		System.out.println("tDiskToSql: Program Starting... (v0.91)");
 		new DiskToSQL();
 		System.out.println("tDiskToSql: Program finished");
 	}
@@ -71,8 +71,11 @@ public class DiskToSQL {
 		if (sql.isDatabaseReady()) {
 			ReadFromDisk newRead = new ReadFromDisk();
 			while (newRead.nextStatus()) {
-				boolean isStatus = false;
-				if (newRead.isStatusNewType()) { 
+				if (twitterFields.isDeletionNotice(newRead.getStatus())) {
+					sql.processDeletionNotice(newRead.getStatus());
+				} else if (twitterFields.isTrackLimitation(newRead.getStatus())) {
+					sql.processTrackLimitation(newRead.getStatus(), newRead.dataFileDate());
+				} else if (newRead.isStatusNewType()) { 
 					// new style string json object saved by DataObjectFactory.getRawJSON(status)
 					try {
 						statusObj = DataObjectFactory.createObject(newRead.getStatus());
@@ -84,26 +87,13 @@ public class DiskToSQL {
 					if (statusObj instanceof Status) {
 						//	new style status object
 						sql.tweetToSQL((Status) statusObj);
-						isStatus = true;
 					} 
-				} else { // OLD Style broken json status object
-					if (twitterFields.isTweet(newRead.getStatus())) {
-						sql.tweetToSQL(newRead.getStatus());
-						isStatus = true;
-					}
-				}
-
-				if (! isStatus) {
-					if (twitterFields.isDeletionNotice(newRead.getStatus())) {
-						sql.processDeletionNotice(newRead.getStatus());
-					} else if (twitterFields.isTrackLimitation(newRead.getStatus())) {
-						sql.processTrackLimitation(newRead.getStatus(),
-								newRead.dataFileDate());
-					} else {
-						String message = "tDiskToSQL: unexpected Twitter response: ";
-						System.err.println(message + newRead.getStatus());
-						sendMail.sendMessage(message, message + newRead.getStatus());
-					}
+				} else if (twitterFields.isTweet(newRead.getStatus())) {
+					sql.tweetToSQL(newRead.getStatus());
+				} else {
+					String message = "tDiskToSQL: unexpected Twitter response: ";
+					System.err.println(message + newRead.getStatus());
+					sendMail.sendMessage(message, message + newRead.getStatus());
 				}
 			}
 		}

@@ -20,6 +20,7 @@ package au.net.moon.tDiskToSQL;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.TwitterException;
+import twitter4j.internal.json.DataObjectFactoryUtil;
 import twitter4j.internal.org.json.JSONObject;
 import twitter4j.json.DataObjectFactory;
 import au.net.moon.tUtils.RedirectSystemLogs;
@@ -58,7 +59,7 @@ public class DiskToSQL {
 		if (!debug) {
 			new RedirectSystemLogs("tDiskToSQL.%g.log");
 		}
-		System.out.println("tDiskToSql: Program Starting... (v0.91)");
+		System.out.println("tDiskToSql: Program Starting... (v0.92)");
 		new DiskToSQL();
 		System.out.println("tDiskToSql: Program finished");
 	}
@@ -79,6 +80,7 @@ public class DiskToSQL {
 					// new style string json object saved by DataObjectFactory.getRawJSON(status)
 					try {
 						statusObj = DataObjectFactory.createObject(newRead.getStatus());
+						DataObjectFactoryUtil.clearThreadLocalMap(); // Clear map of all JSON that factory stores to prevent heap overflow
 					} catch (TwitterException e) {
 						String message = "tDiskToSQL: couldn't convert json string to JSONObject: ";
 						System.err.println(message + newRead.getStatus());

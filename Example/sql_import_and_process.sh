@@ -27,7 +27,7 @@ check_errs()
 
 if [ ! -e tDiskToSQL.0.log.lck ]		# If lck file exist then already running! 
 	then
-        java -Xmx2048m -jar tDiskToSQL-0.0.2-SNAPSHOT-jar-with-dependencies.jar
+        java -jar tDiskToSQL-0.0.2-SNAPSHOT-jar-with-dependencies.jar
         check_errs $? "tDiskToSQL returned an error, see logfile (tDiskToSQL.0.log) for details"
 		if [ ! -e SearchImport.0.lck ]		# If lck file exist then already running! 
 			then

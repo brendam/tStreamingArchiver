@@ -4,12 +4,12 @@ The three sample shell script files will work on linux and mac osx.
 
 Before they can be run, you must:
 
-1. create the `twitter4j.properties` from `twitter4j.properties.sample` with the OAuth login details for your research Twitter account.
-2. create the `tArchiver.properties` from `tArchiver.properties.sample` with your mySQL database details and email details for error messages. (`runStreamingArchiver.sh` can be used to collect data without needing a mySQL database)
+1. create a file called `twitter4j.properties` in this `Example` directory from the `twitter4j.properties.sample` file. Fill in the OAuth login details for your research Twitter account. The `jsonStoreEnabled=true` must be set to true.
+2. create the `tArchiver.properties` from `tArchiver.properties.sample` with your mySQL database details and email details for error messages. Instructions for creating the mySQL databases are provided further down this document. `runStreamingArchiver.sh` can be used to collect data without needing a mySQL database, in which case you don't need to set any mySQL properties.
 3. edit `./data/searches.txt` to set the keyword and userid searches
-4. `runSearchArchiver.sh` writes directly to the SearchAPI mySQL database, so this must exist and it's details be in the `tArchiver.properties` file.
+4. `runSearchArchiver.sh` writes directly to the SearchAPI mySQL database, so if you want to use search you need to create the database and put it's details be in the `tArchiver.properties` file.
 
-Note: If you are updating from an earlier version of tStreamingArchiver you must add `jsonStoreEnabled=true` to twitter4j.properties to enable saving the raw json format data.
+**Note:** If you are updating from an earlier version of tStreamingArchiver you must add `jsonStoreEnabled=true` to twitter4j.properties to enable saving the raw json format data.
 
 ### format of `searches.txt` file
 
@@ -22,7 +22,7 @@ Twitter user ids can be looked up at http://id.twidder.info/
 ###`runStreamingArchiver.sh`
 
 This runs the program that collects the Tweets using the Twitter StreamingAPI (tStreamingArchiver-0.0.1-SNAPSHOT-jar-with-dependencies.jar)
-Tweets recieved from Twitter StreamingAPI are saved into `./data/<year>/<month>/<day>/<hour>.txt` files where the time and data are in GMT, for example `./data/2012/06/05/10-56-32.txt`
+Tweets recieved from Twitter StreamingAPI are saved into `./data/<year>/<month>/<day>/<hour>.txt` files where the time and data are in GMT, for example `./data/2012/06/05/10-56-32.txt`. Requires the `twitter4j.properties` and `searches.txt` files to be configured.
  
 ###`sql_import_and_process.sh`
 
@@ -41,8 +41,11 @@ The script includes commented out calls to run the `tUpdateSearchTermIndexing-0.
 
 ###`runSearchArchiver.sh`
 
-This runs the program that collects the Tweets using the Twitter SearchAPI (tSearchArchiver-0.0.1-SNAPSHOT-jar-with-dependencies.jar)
-Tweets recieved from Twitter SearchAPI are written directly to the `twitter_archive` mySQL database (see next section for how to create this).
+This runs the program that collects the Tweets using the Twitter SearchAPI (tSearchArchiver-0.0.1-SNAPSHOT-jar-with-dependencies.jar). Generally searches are only useful for getting historic data (limit of 1,500 tweets per search) or a sample of tweets for developing keywords for the streaming API. Twitter has asked that the streamAPI be used for research as it puts less load on their servers.
+
+The searches are read from the `twitter_archive` mySQL database and Tweets recieved from Twitter SearchAPI are written directly to the database (see next section for how to create this).
+
+
 
 ###Create mySQL database
 

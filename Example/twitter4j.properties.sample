@@ -1,6 +1,8 @@
 // see http://twitter4j.org/en/configuration.html for available properties
 // having debug=true will put all the tweets into the log files
 debug=false
+
+// this line must be set to true for the json style output to datafiles
 jsonStoreEnabled=true
 
 oauth.consumerKey=xxx

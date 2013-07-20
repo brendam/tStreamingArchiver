@@ -5,7 +5,7 @@ The three sample shell script files will work on linux and mac osx.
 Before they can be run, you must:
 
 1. create a file called `twitter4j.properties` in this `Example` directory from the `twitter4j.properties.sample` file. Fill in the OAuth login details for your research Twitter account. The `jsonStoreEnabled=true` must be set to true.
-2. create the `tArchiver.properties` from `tArchiver.properties.sample` with your mySQL database details and email details for error messages. Instructions for creating the mySQL databases are provided further down this document. `runStreamingArchiver.sh` can be used to collect data without needing a mySQL database, in which case you don't need to set any mySQL properties.
+2. create the `tArchiver.properties` from `tArchiver.properties.sample` with your mySQL database details and email details for error messages. Instructions for creating the mySQL databases are provided further down this document. `runStreamingArchiver.sh` can be used to collect data without needing a mySQL database, in which case you don't need to set any mySQL properties. See below for example python program `import_raw_data_to_CSV.py` to parse raw data files to csv.
 3. edit `./data/searches.txt` to set the keyword and userid searches
 4. `runSearchArchiver.sh` writes directly to the SearchAPI mySQL database, so if you want to use search you need to create the database and put it's details be in the `tArchiver.properties` file.
 
@@ -45,7 +45,9 @@ This runs the program that collects the Tweets using the Twitter SearchAPI (tSea
 
 The searches are read from the `twitter_archive` mySQL database and Tweets recieved from Twitter SearchAPI are written directly to the database (see next section for how to create this).
 
+###`import_raw_data_to_CSV.py`
 
+Example python program to parse new style json raw data files to csv. Run as `python import_raw_data_to_CSV.py`. Example processes the default `smile` search data into `smile_data.csv`. Excel doesn't work well with UniCode data (at least on Mac) so you will need to use Numbers, OpenOffice or Google Spreadsheet if you want to see Unicode correctly.
 
 ###Create mySQL database
 

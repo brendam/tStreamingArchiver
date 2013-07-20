@@ -45,6 +45,7 @@ with open('smile_data.csv', 'wb') as csvfile:
                     tweet = json.loads(text)
                 except ValueError, e:
                     print 'Error: ', e, text
+                    continue
                 if first:
                     print '\nAvailable tweet keys:', tweet.keys()
                     print "\nAvailable tweet['user'] keys:", tweet['user'].keys(), '\n'

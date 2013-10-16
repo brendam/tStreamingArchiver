@@ -59,7 +59,7 @@ public class DiskToSQL {
 		if (!debug) {
 			new RedirectSystemLogs("tDiskToSQL.%g.log");
 		}
-		System.out.println("tDiskToSql: Program Starting... (v0.92)");
+		System.out.println("tDiskToSql: Program Starting... (v0.94)");
 		new DiskToSQL();
 		System.out.println("tDiskToSql: Program finished");
 	}

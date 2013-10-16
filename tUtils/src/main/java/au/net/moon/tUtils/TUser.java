@@ -191,7 +191,11 @@ public class TUser {
 		screenName = twitterUser.getScreenName();
 		location = twitterUser.getLocation();
 		description = twitterUser.getDescription();
-		profileImageUrl = twitterUser.getProfileImageURL().toString();
+		if (twitterUser.getProfileImageURL() != null) {
+			profileImageUrl = twitterUser.getProfileImageURL().toString();
+		} else {
+			profileImageUrl = "";
+		}
 		if (twitterUser.getURL() != null) {
 			url = twitterUser.getURL().toString();
 		} else {
@@ -211,8 +215,11 @@ public class TUser {
 		favouritesCount = twitterUser.getFavouritesCount();
 		utcOffset = twitterUser.getUtcOffset();
 		timeZone = twitterUser.getTimeZone();
-		profileBackgroundImageUrl = twitterUser.getOriginalProfileImageURL()
-				.toString();
+		if (twitterUser.getOriginalProfileImageURL() != null) {
+			profileBackgroundImageUrl = twitterUser.getOriginalProfileImageURL().toString();
+		} else {
+			profileBackgroundImageUrl = "";
+		}
 		isProfileBackgroundTiled = twitterUser.isProfileBackgroundTiled();
 		statusesCount = twitterUser.getStatusesCount();
 		isGeoEnabled = twitterUser.isGeoEnabled();

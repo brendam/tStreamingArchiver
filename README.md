@@ -1,4 +1,4 @@
-##tStreamingArchiver
+## tStreamingArchiver
 
 tStreamingArchiver is a set of programs for archiving Tweets using the Twitter API and moving them into a mySQL database. It is written in the Java language and licensed under GPL 2.0.
 
@@ -23,17 +23,17 @@ It is setup as a group of 10 eclipse projects using maven to bring in their depe
 * Discontinued modules:
     * **tTwapperKeeperImport** - import twapperKeeper archives
 
-###How To Get Started
+### How To Get Started
 
 If you want to build the source code, it is setup to work with [Eclipse](http://eclipse.org/) and ([Maven Eclipse (m2e)](http://www.eclipse.org/m2e/). To build the project, setup a "Run as Maven Build" run option with Goals set to "clean install javadoc:javadoc".
 
 If you just want to use the programs, then you only need the **Example directory** and the instructions in the README.md file in that directory. You do need to have Java installed (for example [Sun Java](http://java.com/en/download/index.jsp)).
 
-###Bugs / Requests
+### Bugs / Requests
 
 If you find any bugs or have any suggestions for improvements, please use the issues section on GitHub. 
 
-###Citing this work
+### Citing this work
 
 If you use tStreamingArchiver in publications, please cite the following...
 
